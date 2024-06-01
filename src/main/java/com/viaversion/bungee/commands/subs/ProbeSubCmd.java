@@ -17,10 +17,10 @@
  */
 package com.viaversion.bungee.commands.subs;
 
+import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
-import com.viaversion.bungee.platform.BungeeViaConfig;
 
 public class ProbeSubCmd implements ViaSubCommand {
     @Override
@@ -31,7 +31,7 @@ public class ProbeSubCmd implements ViaSubCommand {
     @Override
     public String description() {
         return "Forces ViaVersion to scan server protocol versions " +
-            (((BungeeViaConfig) Via.getConfig()).getBungeePingInterval() == -1 ?
+            (((ViaBungeePlatform) Via.getPlatform()).getBungeeConfig().getBungeePingInterval() == -1 ?
                 "" : "(Also happens at an interval)");
     }
 
