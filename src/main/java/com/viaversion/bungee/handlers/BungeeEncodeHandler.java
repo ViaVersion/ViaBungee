@@ -105,4 +105,8 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         if (cause instanceof CancelCodecException) return;
         super.exceptionCaught(ctx, cause);
     }
+
+    public UserConnection connection() {
+        return info;
+    }
 }
