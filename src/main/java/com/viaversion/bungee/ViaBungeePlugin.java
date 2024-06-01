@@ -30,7 +30,7 @@ public class ViaBungeePlugin extends Plugin {
     public void onLoad() {
         getDataFolder().mkdirs();
         loadImplementation();
-        platform = new ViaBungeePlatform(this);
+        platform = new ViaBungeePlatform(this, getDataFolder());
     }
 
     @Override

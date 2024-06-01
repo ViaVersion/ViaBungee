@@ -17,9 +17,10 @@
  */
 package com.viaversion.bungee.service;
 
+import com.viaversion.bungee.ViaBungeeConfig;
+import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
 import java.util.Collection;
@@ -47,7 +48,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
             setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-            final BungeeViaConfig config = (BungeeViaConfig) Via.getConfig();
+            final ViaBungeeConfig config = ((ViaBungeePlatform) Via.getPlatform()).getBungeeConfig();
             if (config.isBungeePingSave()) {
                 final Map<String, Integer> servers = config.getBungeeServerProtocols();
                 final Integer protocol = servers.get(serverName);
@@ -84,7 +85,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
     @Override
     protected Map<String, Integer> configuredServers() {
-        return ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
+        return ((ViaBungeePlatform) Via.getPlatform()).getBungeeConfig().getBungeeServerProtocols();
     }
 
     @Override

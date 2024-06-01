@@ -58,9 +58,10 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
     private final ViaBungeePlugin plugin;
     private final BungeeViaAPI api;
-    private final BungeeViaConfig config;
+    private final BungeeViaConfig viaConfig;
+    private final ViaBungeeConfig bungeeConfig;
 
-    public ViaBungeePlatform(final ViaBungeePlugin plugin) {
+    public ViaBungeePlatform(final ViaBungeePlugin plugin, final File pluginFolder) {
         this.plugin = plugin;
         try {
             ProtocolConstants.class.getField("MINECRAFT_1_20_5");
@@ -78,7 +79,8 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
             "Consider moving Via plugins to your backend server or switching to Velocity.");
 
         api = new BungeeViaAPI();
-        config = new BungeeViaConfig(getDataFolder(), getLogger());
+        viaConfig = new BungeeViaConfig(getDataFolder(), getLogger());
+        bungeeConfig = new ViaBungeeConfig(new File(pluginFolder, "config.yml"), getLogger());
         BungeeCommandHandler commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(plugin, new BungeeCommand(commandHandler));
 
@@ -90,7 +92,8 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
             .commandHandler(commandHandler)
             .build());
 
-        config.reload();
+        viaConfig.reload();
+        bungeeConfig.reload();
 
         if (hasClass("com.viaversion.viabackwards.api.ViaBackwardsPlatform")) {
             getLogger().info("Found ViaBackwards, loading it");
@@ -210,7 +213,11 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
 
     @Override
     public BungeeViaConfig getConf() {
-        return config;
+        return viaConfig;
+    }
+
+    public ViaBungeeConfig getBungeeConfig() {
+        return bungeeConfig;
     }
 
     @Override

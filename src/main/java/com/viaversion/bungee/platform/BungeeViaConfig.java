@@ -30,20 +30,9 @@ import java.util.logging.Logger;
 
 public class BungeeViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
-    private int bungeePingInterval;
-    private boolean bungeePingSave;
-    private Map<String, Integer> bungeeServerProtocols;
 
     public BungeeViaConfig(File folder, Logger logger) {
-        super(new File(folder, "config.yml"), logger);
-    }
-
-    @Override
-    protected void loadFields() {
-        super.loadFields();
-        bungeePingInterval = getInt("bungee-ping-interval", 60);
-        bungeePingSave = getBoolean("bungee-ping-save", true);
-        bungeeServerProtocols = get("bungee-servers", new HashMap<>());
+        super(new File(folder, "viaversion.yml"), logger);
     }
 
     @Override
@@ -91,34 +80,5 @@ public class BungeeViaConfig extends AbstractViaConfig {
     @Override
     public boolean isNMSPlayerTicking() {
         return false;
-    }
-
-    /**
-     * What is the interval for checking servers via ping
-     * -1 for disabled
-     *
-     * @return Ping interval in seconds
-     */
-    public int getBungeePingInterval() {
-        return bungeePingInterval;
-    }
-
-    /**
-     * Should the bungee ping be saved to the config on change.
-     *
-     * @return True if it should save
-     */
-    public boolean isBungeePingSave() {
-        return bungeePingSave;
-    }
-
-    /**
-     * Get the listed server protocols in the config.
-     * default will be listed as default.
-     *
-     * @return Map of String, Integer
-     */
-    public Map<String, Integer> getBungeeServerProtocols() {
-        return bungeeServerProtocols;
     }
 }
