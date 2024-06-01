@@ -34,9 +34,11 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
+import io.netty.channel.Channel;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,8 +47,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -65,6 +69,8 @@ public class BungeeServerHandler implements Listener {
     private static final MethodHandle SET_VERSION;
     private static final MethodHandle SET_ENTITY_REWRITE;
     private static final MethodHandle GET_CHANNEL_WRAPPER;
+    private static final MethodHandle GET_INITIAL_CHANNEL_WRAPPER;
+    private static final MethodHandle GET_CHANNEL;
 
     static {
         try {
@@ -83,10 +89,59 @@ public class BungeeServerHandler implements Listener {
             final MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(userConnectionClass, lookup);
             GET_CHANNEL_WRAPPER = privateLookup.findGetter(userConnectionClass, "ch", channelWrapperClass);
             SET_ENTITY_REWRITE = privateLookup.findSetter(userConnectionClass, "entityRewrite", entityMapClass);
+
+            final Field channelWrapperField = initialHandlerClass.getDeclaredField("ch");
+            channelWrapperField.setAccessible(true);
+            GET_INITIAL_CHANNEL_WRAPPER = privateLookup.unreflectGetter(channelWrapperField);
+            GET_CHANNEL = privateLookup.findVirtual(channelWrapperClass, "getHandle", MethodType.methodType(Channel.class));
         } catch (final ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
         }
+    }
+
+    @EventHandler(priority = 120)
+    public void onJoin(final LoginEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        // This listener is used to handle the login event and set the protocol info.
+        // Usually, the connection is added to the user connection list after sending the gameprofile packet,
+        // but due to the poor injection point and Bungee delaying the login success, we have to do it here.
+        // Based on https://github.com/ViaVersion/ViaVersion/blob/2d41eb52a6692e7552242091d749c3058d99f9e9/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
+        final PendingConnection player = event.getConnection();
+        final Channel channel;
+        try {
+            channel = getChannel(player);
+        } catch (final Throwable t) {
+            Via.getPlatform().getLogger().log(Level.WARNING, t,
+                () -> "Could not find Channel for logging-in player " + player.getUniqueId());
+            return;
+        }
+
+        if (!channel.isOpen()) {
+            return;
+        }
+
+        final BungeeEncodeHandler encoder = channel.pipeline().get(BungeeEncodeHandler.class);
+        if (encoder == null) {
+            Via.getPlatform().getLogger().log(Level.WARNING,
+                "Could not find UserConnection for logging-in player {0}",
+                player.getUniqueId());
+            return;
+        }
+
+        final UserConnection user = encoder.connection();
+        final ProtocolInfo info = user.getProtocolInfo();
+        info.setUuid(player.getUniqueId());
+        info.setUsername(player.getName());
+        Via.getManager().getConnectionManager().onLoginSuccess(user);
+    }
+
+    private Channel getChannel(final PendingConnection player) throws Throwable {
+        final Object channelWrapper = GET_INITIAL_CHANNEL_WRAPPER.invoke(player);
+        return (Channel) GET_CHANNEL.invoke(channelWrapper);
     }
 
     // Set the handshake version every time someone connects to any server

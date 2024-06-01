@@ -56,7 +56,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
     @Override
     public void load() {
         // Listeners
-        registerListener(plugin);
         registerListener(new UpdateListener());
         registerListener(new BungeeServerHandler());
 

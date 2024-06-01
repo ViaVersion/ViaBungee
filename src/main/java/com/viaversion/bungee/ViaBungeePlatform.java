@@ -50,11 +50,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
-public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPlayer>, Listener {
+public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPlayer> {
     private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
     private final ViaBungeePlugin plugin;
     private final BungeeViaAPI api;
@@ -63,7 +62,7 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     public ViaBungeePlatform(final ViaBungeePlugin plugin) {
         this.plugin = plugin;
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_20_5");
+            ProtocolConstants.class.getField("MINECRAFT_1_21");
         } catch (final NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
