@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "com.viaversion.viabungee"
+group = "com.viaversion"
 version = "1.0.0"
 
 dependencies {
