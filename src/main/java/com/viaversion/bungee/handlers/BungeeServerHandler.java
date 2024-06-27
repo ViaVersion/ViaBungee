@@ -272,7 +272,7 @@ public class BungeeServerHandler implements Listener {
             if (currentTeam == null) {
                 // Send auto-team as it was cleared above
                 newTracker.sendTeamPacket(true, true);
-                newTracker.setCurrentTeam("com/viaversion/viaversion");
+                newTracker.setCurrentTeam("viaversion");
             } else {
                 // Auto-team will be sent when bungee send remove packet
                 newTracker.setAutoTeam(Via.getConfig().isAutoTeam());
