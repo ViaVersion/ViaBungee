@@ -7,7 +7,7 @@ group = "com.viaversion.viabungee"
 version = "1.0.0"
 
 dependencies {
-    compileOnly("com.viaversion:viaversion-common:5.0.0-SNAPSHOT")
+    compileOnly("com.viaversion:viaversion-common:5.0.2-SNAPSHOT")
     compileOnly("com.viaversion:viabackwards-common:5.0.0-SNAPSHOT")
     compileOnly("com.viaversion:viarewind-common:4.0.0-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.20-R0.3-SNAPSHOT")

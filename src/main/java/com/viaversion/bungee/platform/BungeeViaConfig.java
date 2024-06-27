@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,10 +29,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class BungeeViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
+    protected final List<String> UNSUPPORTED = new ArrayList<>();
 
     public BungeeViaConfig(File folder, Logger logger) {
         super(new File(folder, "viaversion.yml"), logger);
+
+        UNSUPPORTED.addAll(BUKKIT_ONLY_OPTIONS);
+        UNSUPPORTED.addAll(VELOCITY_ONLY_OPTIONS);
     }
 
     @Override
@@ -70,15 +73,5 @@ public class BungeeViaConfig extends AbstractViaConfig {
     @Override
     public List<String> getUnsupportedOptions() {
         return UNSUPPORTED;
-    }
-
-    @Override
-    public boolean isItemCache() {
-        return false;
-    }
-
-    @Override
-    public boolean isNMSPlayerTicking() {
-        return false;
     }
 }
