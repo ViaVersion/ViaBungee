@@ -34,8 +34,8 @@ public class BungeeViaConfig extends AbstractViaConfig {
     public BungeeViaConfig(File folder, Logger logger) {
         super(new File(folder, "viaversion.yml"), logger);
 
-        UNSUPPORTED.addAll(BUKKIT_ONLY_OPTIONS);
-        UNSUPPORTED.addAll(VELOCITY_ONLY_OPTIONS);
+        UNSUPPORTED.addAll(AbstractViaConfig.BUKKIT_ONLY_OPTIONS);
+        UNSUPPORTED.addAll(AbstractViaConfig.VELOCITY_ONLY_OPTIONS);
     }
 
     @Override
