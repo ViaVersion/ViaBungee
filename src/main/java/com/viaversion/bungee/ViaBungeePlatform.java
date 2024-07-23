@@ -102,6 +102,10 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
             getLogger().info("Found ViaRewind, loading it");
             Via.getManager().addEnableListener(() -> new ViaRewindLoader(getLogger(), getDataFolder()));
         }
+        if (hasClass("net.raphimc.viaaprilfools.platform.ViaAprilFoolsPlatform")) {
+            getLogger().info("Found ViaAprilFools, loading it");
+            Via.getManager().addEnableListener(() -> new ViaAprilFoolsLoader(getLogger(), getDataFolder()));
+        }
     }
 
     private boolean hasClass(final String name) {
