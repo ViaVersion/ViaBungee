@@ -27,7 +27,7 @@ public record ViaBackwardsLoader(Logger logger, File dataFolder) implements ViaB
     public ViaBackwardsLoader(final Logger logger, final File dataFolder) {
         this.logger = logger;
         this.dataFolder = dataFolder;
-        this.init(new File(this.dataFolder, "config.yml"));
+        this.init(new File(this.dataFolder, "viabackwards.yml"));
     }
 
     @Override

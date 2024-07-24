@@ -27,7 +27,7 @@ public record ViaAprilFoolsLoader(Logger logger, File dataFolder) implements Via
     public ViaAprilFoolsLoader(final Logger logger, final File dataFolder) {
         this.logger = logger;
         this.dataFolder = dataFolder;
-        this.init(new File(this.dataFolder, "config.yml"));
+        this.init(new File(this.dataFolder, "viaaprilfools.yml"));
     }
 
     @Override

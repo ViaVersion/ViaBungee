@@ -27,7 +27,7 @@ public record ViaRewindLoader(Logger logger, File dataFolder) implements ViaRewi
     public ViaRewindLoader(final Logger logger, final File dataFolder) {
         this.logger = logger;
         this.dataFolder = dataFolder;
-        this.init(new File(this.dataFolder, "config.yml"));
+        this.init(new File(this.dataFolder, "viarewind.yml"));
     }
 
     @Override
