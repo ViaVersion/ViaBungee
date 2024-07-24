@@ -2,4 +2,4 @@ name: ViaVersion
 main: com.viaversion.bungee.ViaBungeePlugin
 description: Loader for the main ViaVersion implementation
 author: _MylesC, creeper123123321, Gerrygames, kennytv, Matsv, EnZaXD, RK_01
-version: 0.1.0
+version: 0.1.1
