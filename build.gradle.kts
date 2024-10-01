@@ -1,5 +1,5 @@
 plugins {
-    id("com.gradleup.shadow") version "8.3.0"
+    id("com.gradleup.shadow") version "8.3.2"
     id("java")
 }
 
