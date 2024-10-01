@@ -18,6 +18,7 @@
 package com.viaversion.bungee.platform;
 
 import com.viaversion.bungee.handlers.BungeeChannelInitializer;
+import com.viaversion.bungee.util.SetWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
@@ -25,7 +26,6 @@ import com.viaversion.viaversion.libs.fastutil.objects.ObjectLinkedOpenHashSet;
 import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.util.ReflectionUtil;
-import com.viaversion.viaversion.util.SetWrapper;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
