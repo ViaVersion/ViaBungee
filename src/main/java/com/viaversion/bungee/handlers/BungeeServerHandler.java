@@ -265,7 +265,7 @@ public class BungeeServerHandler implements Listener {
         }
 
         // Add version-specific base Protocol
-        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
+        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocols(info.protocolVersion(), serverProtocolVersion));
 
         // Workaround 1.13 server change
         boolean toNewId = previousServerProtocol.olderThan(ProtocolVersion.v1_13) && serverProtocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_13);
