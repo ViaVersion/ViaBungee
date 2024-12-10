@@ -19,8 +19,8 @@ package com.viaversion.bungee.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class BungeePipelineUtil {
         try {
             DECODE_METHOD = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
             DECODE_METHOD.setAccessible(true);
-            ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
+            ENCODE_METHOD = MessageToMessageEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, List.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -51,8 +51,8 @@ public class BungeePipelineUtil {
         return output;
     }
 
-    public static ByteBuf callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
-        ByteBuf output = ctx.alloc().buffer();
+    public static List<Object> callEncode(MessageToMessageEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
+        List<Object> output = new ArrayList<>();
         try {
             BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, input, output);
         } catch (IllegalAccessException e) {
@@ -72,7 +72,7 @@ public class BungeePipelineUtil {
 
     public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf bytebuf) {
         try {
-            return callEncode((MessageToByteEncoder) ctx.pipeline().get("compress"), ctx.pipeline().context("compress"), bytebuf);
+            return (ByteBuf) callEncode((MessageToMessageEncoder) ctx.pipeline().get("compress"), ctx.pipeline().context("compress"), bytebuf).get(0);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
             return ctx.alloc().buffer();
