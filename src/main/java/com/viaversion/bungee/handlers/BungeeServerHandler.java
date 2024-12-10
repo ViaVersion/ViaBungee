@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -264,8 +265,11 @@ public class BungeeServerHandler implements Listener {
             info.setServerProtocolVersion(serverProtocolVersion);
         }
 
-        // Add version-specific base Protocol
-        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocols(info.protocolVersion(), serverProtocolVersion));
+        // Add version-specific base Protocols
+        final List<Protocol> baseProtocols = Via.getManager().getProtocolManager().getBaseProtocols(info.protocolVersion(), serverProtocolVersion);
+        for (final Protocol<?, ?, ?, ?> protocol : baseProtocols) {
+            pipeline.add(protocol);
+        }
 
         // Workaround 1.13 server change
         boolean toNewId = previousServerProtocol.olderThan(ProtocolVersion.v1_13) && serverProtocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_13);
