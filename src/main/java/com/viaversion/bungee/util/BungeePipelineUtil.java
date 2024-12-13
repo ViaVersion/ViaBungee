@@ -41,7 +41,7 @@ public class BungeePipelineUtil {
         }
     }
 
-    public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
+    private static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             BungeePipelineUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
@@ -51,7 +51,7 @@ public class BungeePipelineUtil {
         return output;
     }
 
-    public static ByteBuf callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
+    private static ByteBuf callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
         ByteBuf output = ctx.alloc().buffer();
         try {
             BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, input, output);
@@ -71,6 +71,9 @@ public class BungeePipelineUtil {
     }
 
     public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf bytebuf) {
+        if (WaterfallPipelineUtil.IS_WATERFALL) {
+            return WaterfallPipelineUtil.compress(ctx, bytebuf);
+        }
         try {
             return callEncode((MessageToByteEncoder) ctx.pipeline().get("compress"), ctx.pipeline().context("compress"), bytebuf);
         } catch (InvocationTargetException e) {
