@@ -205,11 +205,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     }
 
     @Override
-    public boolean isPluginEnabled() {
-        return true;
-    }
-
-    @Override
     public ViaAPI<ProxiedPlayer> getApi() {
         return api;
     }
