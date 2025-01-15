@@ -4,7 +4,7 @@
 > This currently only works if **both client and server are below 1.20.2**.
 
 See https://github.com/ViaVersion/ViaVersion for the main project. Note that we recommend putting ViaVersion on your 
-backend servers, or switching to [Velocity](https://github.com/PaperMC/Velocity) or [ViaProxy](https://github.com/ViaVersion/ViaProxy) as ViaBungee is fairly unstable due to platform limitations.
+backend servers, or switching to [Velocity](https://github.com/PaperMC/Velocity) or [ViaProxy](https://github.com/ViaVersion/ViaProxy) with [BungeeViaProxy plugin](https://github.com/ViaVersionAddons/BungeeViaProxy) as ViaBungee is fairly unstable due to platform limitations.
 
 ## To get started
 
