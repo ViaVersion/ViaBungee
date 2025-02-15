@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.bungee.handlers.BungeeServerHandler;
+import com.viaversion.bungee.listeners.ServerSwitchListener;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
@@ -57,7 +57,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
     public void load() {
         // Listeners
         registerListener(new UpdateListener());
-        registerListener(new BungeeServerHandler());
+        registerListener(new ServerSwitchListener());
 
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {

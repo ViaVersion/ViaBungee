@@ -21,7 +21,6 @@ import com.viaversion.bungee.ViaBungeeConfig;
 import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 public final class ProtocolDetectorService extends AbstractProtocolDetectorService {
 
@@ -90,6 +90,6 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
     @Override
     protected ProtocolVersion lowestSupportedProtocolVersion() {
-        return BungeeVersionProvider.getLowestSupportedVersion();
+        return ProtocolVersion.getProtocol(ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
     }
 }

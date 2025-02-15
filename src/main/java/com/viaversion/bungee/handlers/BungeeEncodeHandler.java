@@ -21,29 +21,32 @@ import com.viaversion.bungee.util.BungeePipelineUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
+import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
+import static com.viaversion.bungee.handlers.PipelineConstants.*;
+
 @ChannelHandler.Sharable
 public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
-    private final UserConnection info;
+
+    private final UserConnection connection;
     private boolean handledCompression;
 
-    public BungeeEncodeHandler(UserConnection info) {
-        this.info = info;
+    public BungeeEncodeHandler(UserConnection connection) {
+        this.connection = connection;
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        if (!ctx.channel().isActive()) {
+    protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) {
+        if (!connection.checkClientboundPacket()) {
             throw CancelEncoderException.generate(null);
         }
-
-        if (!info.checkClientboundPacket()) throw CancelEncoderException.generate(null);
-        if (!info.shouldTransformPacket()) {
+        if (!connection.shouldTransformPacket()) {
             out.add(bytebuf.retain());
             return;
         }
@@ -51,12 +54,10 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
-            info.transformClientbound(transformedBuf, CancelEncoderException::generate);
-
+            connection.transformClientbound(transformedBuf, CancelEncoderException::generate);
             if (needsCompress) {
                 recompress(ctx, transformedBuf);
             }
-
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
@@ -64,8 +65,11 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
-        boolean needsCompress = false;
-        if (!handledCompression && ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
+        if (handledCompression) {
+            return false;
+        }
+
+        if (ctx.pipeline().names().indexOf(COMPRESS) > ctx.pipeline().names().indexOf(VIA_ENCODER)) {
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
 
@@ -79,16 +83,16 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             }
 
             // Reorder the pipeline
-            ChannelHandler decoder = ctx.pipeline().get("via-decoder");
-            ChannelHandler encoder = ctx.pipeline().get("via-encoder");
+            ChannelHandler decoder = ctx.pipeline().get(VIA_DECODER);
+            ChannelHandler encoder = ctx.pipeline().get(VIA_ENCODER);
             ctx.pipeline().remove(decoder);
             ctx.pipeline().remove(encoder);
-            ctx.pipeline().addAfter("decompress", "via-decoder", decoder);
-            ctx.pipeline().addAfter("compress", "via-encoder", encoder);
-            needsCompress = true;
+            ctx.pipeline().addAfter(DECOMPRESS, VIA_DECODER, decoder);
+            ctx.pipeline().addAfter(COMPRESS, VIA_ENCODER, encoder);
             handledCompression = true;
+            return true;
         }
-        return needsCompress;
+        return false;
     }
 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -101,12 +105,19 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof CancelCodecException) return;
-        super.exceptionCaught(ctx, cause);
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        try {
+            super.write(ctx, msg, promise);
+        } catch (Throwable e) {
+            if (!PipelineUtil.containsCause(e, CancelCodecException.class)) {
+                throw e;
+            } else {
+                promise.setSuccess();
+            }
+        }
     }
 
     public UserConnection connection() {
-        return info;
+        return connection;
     }
 }

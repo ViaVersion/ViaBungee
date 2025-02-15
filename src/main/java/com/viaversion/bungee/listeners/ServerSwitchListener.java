@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.bungee.handlers;
+package com.viaversion.bungee.listeners;
 
 import com.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.api.Via;
@@ -35,11 +35,9 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
-import io.netty.channel.Channel;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,129 +46,43 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 
 // All of this is madness
-public class BungeeServerHandler implements Listener {
-    private static final MethodHandle GET_HANDSHAKE;
+public class ServerSwitchListener implements Listener {
     private static final MethodHandle GET_REGISTERED_CHANNELS;
     private static final MethodHandle GET_BRAND_MESSAGE;
     private static final MethodHandle GET_ENTITY_MAP;
     private static final MethodHandle SET_VERSION;
     private static final MethodHandle SET_ENTITY_REWRITE;
     private static final MethodHandle GET_CHANNEL_WRAPPER;
-    private static final MethodHandle GET_INITIAL_CHANNEL_WRAPPER;
-    private static final MethodHandle GET_CHANNEL;
 
     static {
         try {
             final MethodHandles.Lookup lookup = MethodHandles.lookup();
             final Class<?> initialHandlerClass = Class.forName("net.md_5.bungee.connection.InitialHandler");
-            GET_HANDSHAKE = lookup.findVirtual(initialHandlerClass, "getHandshake", MethodType.methodType(Handshake.class));
-            GET_REGISTERED_CHANNELS = lookup.findVirtual(initialHandlerClass, "getRegisteredChannels", MethodType.methodType(Set.class));
-            GET_BRAND_MESSAGE = lookup.findVirtual(initialHandlerClass, "getBrandMessage", MethodType.methodType(PluginMessage.class));
-
             final Class<?> entityMapClass = Class.forName("net.md_5.bungee.entitymap.EntityMap");
             final Class<?> channelWrapperClass = Class.forName("net.md_5.bungee.netty.ChannelWrapper");
+            final Class<?> userConnectionClass = Class.forName("net.md_5.bungee.UserConnection");
+
+            GET_REGISTERED_CHANNELS = lookup.findVirtual(initialHandlerClass, "getRegisteredChannels", MethodType.methodType(Set.class));
+            GET_BRAND_MESSAGE = lookup.findVirtual(initialHandlerClass, "getBrandMessage", MethodType.methodType(PluginMessage.class));
             GET_ENTITY_MAP = lookup.findStatic(entityMapClass, "getEntityMap", MethodType.methodType(entityMapClass, int.class));
             SET_VERSION = lookup.findVirtual(channelWrapperClass, "setVersion", MethodType.methodType(void.class, int.class));
 
-            final Class<?> userConnectionClass = Class.forName("net.md_5.bungee.UserConnection");
             final MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(userConnectionClass, lookup);
             GET_CHANNEL_WRAPPER = privateLookup.findGetter(userConnectionClass, "ch", channelWrapperClass);
             SET_ENTITY_REWRITE = privateLookup.findSetter(userConnectionClass, "entityRewrite", entityMapClass);
-
-            final Field channelWrapperField = initialHandlerClass.getDeclaredField("ch");
-            channelWrapperField.setAccessible(true);
-            GET_INITIAL_CHANNEL_WRAPPER = privateLookup.unreflectGetter(channelWrapperField);
-            GET_CHANNEL = privateLookup.findVirtual(channelWrapperClass, "getHandle", MethodType.methodType(Channel.class));
         } catch (final ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
-        }
-    }
-
-    @EventHandler(priority = 120)
-    public void onJoin(final LoginEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
-        // This listener is used to handle the login event and set the protocol info.
-        // Usually, the connection is added to the user connection list after sending the gameprofile packet,
-        // but due to the poor injection point and Bungee delaying the login success, we have to do it here.
-        // Based on https://github.com/ViaVersion/ViaVersion/blob/2d41eb52a6692e7552242091d749c3058d99f9e9/bukkit/src/main/java/com/viaversion/viaversion/bukkit/listeners/JoinListener.java
-        final PendingConnection player = event.getConnection();
-        final Channel channel;
-        try {
-            channel = getChannel(player);
-        } catch (final Throwable t) {
-            Via.getPlatform().getLogger().log(Level.WARNING, t,
-                () -> "Could not find Channel for logging-in player " + player.getUniqueId());
-            return;
-        }
-
-        if (!channel.isOpen()) {
-            return;
-        }
-
-        final BungeeEncodeHandler encoder = channel.pipeline().get(BungeeEncodeHandler.class);
-        if (encoder == null) {
-            Via.getPlatform().getLogger().log(Level.WARNING,
-                "Could not find UserConnection for logging-in player {0}",
-                player.getUniqueId());
-            return;
-        }
-
-        final UserConnection user = encoder.connection();
-        final ProtocolInfo info = user.getProtocolInfo();
-        info.setUuid(player.getUniqueId());
-        info.setUsername(player.getName());
-        Via.getManager().getConnectionManager().onLoginSuccess(user);
-    }
-
-    private Channel getChannel(final PendingConnection player) throws Throwable {
-        final Object channelWrapper = GET_INITIAL_CHANNEL_WRAPPER.invoke(player);
-        return (Channel) GET_CHANNEL.invoke(channelWrapper);
-    }
-
-    // Set the handshake version every time someone connects to any server
-    @EventHandler(priority = 120)
-    public void onServerConnect(ServerConnectEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
-        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
-        if (user == null) {
-            return;
-        }
-
-        if (!user.has(BungeeStorage.class)) {
-            user.put(new BungeeStorage(event.getPlayer()));
-        }
-
-        ProtocolVersion serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
-        ProtocolVersion clientProtocolVersion = user.getProtocolInfo().protocolVersion();
-        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
-
-        // Check if ViaVersion can support that version
-        try {
-            Handshake handshake = (Handshake) GET_HANDSHAKE.invoke(event.getPlayer().getPendingConnection());
-            handshake.setProtocolVersion(protocols == null ? clientProtocolVersion.getVersion() : serverProtocolVersion.getVersion());
-        } catch (Throwable e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error setting handshake version", e);
         }
     }
 
