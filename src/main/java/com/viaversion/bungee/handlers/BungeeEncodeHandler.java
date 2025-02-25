@@ -21,15 +21,17 @@ import com.viaversion.bungee.util.BungeePipelineUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
-import com.viaversion.viaversion.util.PipelineUtil;
+import com.viaversion.viaversion.util.ByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
-import static com.viaversion.bungee.handlers.PipelineConstants.*;
+import static com.viaversion.bungee.handlers.PipelineConstants.COMPRESS;
+import static com.viaversion.bungee.handlers.PipelineConstants.DECOMPRESS;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODER;
 
 @ChannelHandler.Sharable
 public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
@@ -51,7 +53,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             return;
         }
 
-        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
             connection.transformClientbound(transformedBuf, CancelEncoderException::generate);

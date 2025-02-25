@@ -31,7 +31,7 @@ import java.util.List;
 import static com.viaversion.bungee.handlers.PipelineConstants.COMPRESS;
 import static com.viaversion.bungee.handlers.PipelineConstants.DECOMPRESS;
 
-public class BungeePipelineUtil {
+public final class BungeePipelineUtil {
     private static final Method DECODE_MESSAGE_METHOD;
     private static final Method ENCODE_MESSAGE_METHOD; // Waterfall support
     private static final Method ENCODE_BYTE_METHOD;
