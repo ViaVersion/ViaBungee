@@ -49,7 +49,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
         ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
-            user.transformServerbound(transformedBuf, CancelDecoderException::generate);
+            user.transformIncoming(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();

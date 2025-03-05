@@ -50,7 +50,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
         ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
-            connection.transformClientbound(transformedBuf, CancelEncoderException::generate);
+            connection.transformOutgoing(transformedBuf, CancelEncoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
