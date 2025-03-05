@@ -51,7 +51,6 @@ import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.protocol.ProtocolConstants;
 
 public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPlayer> {
     private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
@@ -63,8 +62,8 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     public ViaBungeePlatform(final ViaBungeePlugin plugin, final File pluginFolder) {
         this.plugin = plugin;
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_21");
-        } catch (final NoSuchFieldException e) {
+            ProxyServer.getInstance().unsafe();
+        } catch (final NoSuchMethodError e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
             getLogger().warning("    /  |  \\");
@@ -73,9 +72,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
             getLogger().warning(" /     o     \\");
             getLogger().warning("/_____________\\");
         }
-
-        getLogger().warning("ViaVersion does not work as intended across many different server versions, especially the more recent ones. " +
-            "Consider moving Via plugins to your backend server or switching to Velocity.");
 
         api = new BungeeViaAPI();
         viaConfig = new BungeeViaConfig(getDataFolder(), getLogger());
