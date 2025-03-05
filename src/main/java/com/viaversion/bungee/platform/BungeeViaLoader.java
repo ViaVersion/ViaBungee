@@ -17,18 +17,17 @@
  */
 package com.viaversion.bungee.platform;
 
+import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.bungee.listeners.ElytraPatch;
 import com.viaversion.bungee.listeners.UpdateListener;
 import com.viaversion.bungee.providers.BungeeBossBarProvider;
 import com.viaversion.bungee.providers.BungeeEntityIdProvider;
 import com.viaversion.bungee.providers.BungeeMainHandProvider;
 import com.viaversion.bungee.providers.BungeeVersionProvider;
-import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.bungee.handlers.BungeeServerHandler;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
@@ -57,7 +56,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
     public void load() {
         // Listeners
         registerListener(new UpdateListener());
-        registerListener(new BungeeServerHandler());
 
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {

@@ -20,6 +20,8 @@ package com.viaversion.bungee.handlers;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
+import com.viaversion.viaversion.util.ByteBufUtil;
+import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,27 +30,26 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
-    private final UserConnection info;
 
-    public BungeeDecodeHandler(UserConnection info) {
-        this.info = info;
+    private final UserConnection user;
+
+    public BungeeDecodeHandler(UserConnection user) {
+        this.user = user;
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        if (!ctx.channel().isActive()) {
+    protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) {
+        if (!user.checkServerboundPacket()) {
             throw CancelDecoderException.generate(null);
         }
-
-        if (!info.checkServerboundPacket()) throw CancelDecoderException.generate(null);
-        if (!info.shouldTransformPacket()) {
+        if (!user.shouldTransformPacket()) {
             out.add(bytebuf.retain());
             return;
         }
 
-        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
-            info.transformServerbound(transformedBuf, CancelDecoderException::generate);
+            user.transformIncoming(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
@@ -56,8 +57,13 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof CancelCodecException) return;
-        super.exceptionCaught(ctx, cause);
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        try {
+            super.channelRead(ctx, msg);
+        } catch (Throwable e) {
+            if (!PipelineUtil.containsCause(e, CancelCodecException.class)) {
+                throw e;
+            }
+        }
     }
 }

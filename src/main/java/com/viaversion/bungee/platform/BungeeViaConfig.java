@@ -18,8 +18,8 @@
 package com.viaversion.bungee.platform;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
+import net.md_5.bungee.protocol.ProtocolConstants;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
         }
         // Ensure default exists
         if (!servers.containsKey("default")) {
-            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion().getVersion());
+            servers.put("default", ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
         }
         // Put back
         config.put("bungee-servers", servers);
