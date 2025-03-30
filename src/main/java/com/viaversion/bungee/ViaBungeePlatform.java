@@ -21,7 +21,6 @@ package com.viaversion.bungee;
 import com.google.common.collect.ImmutableList;
 import com.viaversion.bungee.commands.BungeeCommand;
 import com.viaversion.bungee.commands.BungeeCommandHandler;
-import com.viaversion.bungee.commands.BungeeCommandSender;
 import com.viaversion.bungee.platform.BungeeViaAPI;
 import com.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.bungee.platform.BungeeViaInjector;
@@ -31,7 +30,6 @@ import com.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.ViaManagerImpl;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
@@ -45,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
@@ -172,32 +169,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long period) {
         return runRepeatingAsync(runnable, period);
-    }
-
-    @Override
-    public ViaCommandSender[] getOnlinePlayers() {
-        Collection<ProxiedPlayer> players = getProxy().getPlayers();
-        ViaCommandSender[] array = new ViaCommandSender[players.size()];
-        int i = 0;
-        for (ProxiedPlayer player : players) {
-            array[i++] = new BungeeCommandSender(player);
-        }
-        return array;
-    }
-
-    @Override
-    public void sendMessage(UUID uuid, String message) {
-        getProxy().getPlayer(uuid).sendMessage(message);
-    }
-
-    @Override
-    public boolean kickPlayer(UUID uuid, String message) {
-        ProxiedPlayer player = getProxy().getPlayer(uuid);
-        if (player != null) {
-            player.disconnect(message);
-            return true;
-        }
-        return false;
     }
 
     @Override
