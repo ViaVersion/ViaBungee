@@ -7,7 +7,7 @@ group = "com.viaversion.viabungee"
 version = "0.3.0-SNAPSHOT"
 
 dependencies {
-    compileOnly("com.viaversion:viaversion-common:5.3.0")
+    compileOnly("com.viaversion:viaversion-common:5.3.2")
     compileOnly("com.viaversion:viabackwards-common:5.3.0")
     compileOnly("com.viaversion:viarewind-common:4.0.6")
     compileOnly("com.viaversion:viaaprilfools-common:4.0.1")
