@@ -12,7 +12,7 @@ dependencies {
     compileOnly("com.viaversion:viarewind-common:4.0.6")
     compileOnly("com.viaversion:viaaprilfools-common:4.0.1")
     compileOnly("net.md-5:bungeecord-api:1.21-R0.3-SNAPSHOT")
-    implementation("net.lenni0451:Reflect:1.4.0")
+    implementation("net.lenni0451:Reflect:1.5.0")
 }
 
 tasks {
