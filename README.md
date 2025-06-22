@@ -1,3 +1,8 @@
+**This project has been discontinued. Please consider putting ViaVersion on your
+backend servers, or switching to [Velocity](https://github.com/PaperMC/Velocity) or [ViaProxy](https://github.com/ViaVersion/ViaProxy) with [BungeeViaProxy plugin](https://github.com/ViaVersionAddons/BungeeViaProxy).**
+
+---
+
 # ViaBungee
 
 See https://github.com/ViaVersion/ViaVersion for the main project.
