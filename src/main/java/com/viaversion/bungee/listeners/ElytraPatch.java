@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
@@ -53,7 +52,7 @@ public class ElytraPatch implements Listener {
             wrapper.write(Types.VAR_INT, entityId);
             List<EntityData> dataList = new ArrayList<>();
             dataList.add(new EntityData(0, EntityDataTypes1_9.BYTE, (byte) 0));
-            wrapper.write(Types1_9.ENTITY_DATA_LIST, dataList);;
+            wrapper.write(Types.ENTITY_DATA_LIST1_9, dataList);
 
             wrapper.scheduleSend(Protocol1_8To1_9.class);
         }

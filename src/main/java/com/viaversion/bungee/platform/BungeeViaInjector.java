@@ -31,15 +31,24 @@ import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.protocol.ProtocolConstants;
-import net.md_5.bungee.protocol.channel.BungeeChannelInitializer;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.ProtocolConstants;
+import net.md_5.bungee.protocol.channel.BungeeChannelInitializer;
+import net.md_5.bungee.protocol.packet.SetCompression;
 
-import static com.viaversion.bungee.handlers.PipelineConstants.*;
+import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_DECODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_ENCODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODER;
 
 public class BungeeViaInjector implements ViaInjector {
 
@@ -77,8 +86,37 @@ public class BungeeViaInjector implements ViaInjector {
         final BungeeDecodeHandler decode = new BungeeDecodeHandler(connection);
         final BungeeEncodeHandler encode = new BungeeEncodeHandler(connection);
 
-        channel.pipeline().addBefore(PACKET_DECODER, VIA_DECODER, decode);
+        injectDecoder(channel, decode);
         channel.pipeline().addBefore(PACKET_ENCODER, VIA_ENCODER, encode);
+
+        channel.pipeline().addAfter(PACKET_ENCODER, "via-encode-reorder", new ChannelOutboundHandlerAdapter() {
+
+            @Override
+            public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
+                if (msg instanceof SetCompression) {
+                    channel.eventLoop().execute(() -> injectDecoder(channel, decode));
+                }
+                super.write(ctx, msg, promise);
+            }
+        });
+
+        channel.pipeline().addAfter(PACKET_DECODER, "via-decode-reorder", new ChannelInboundHandlerAdapter() {
+
+            @Override
+            public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+                super.channelRead(ctx, msg);
+                if (msg instanceof PacketWrapper packetWrapper && packetWrapper.packet instanceof SetCompression) {
+                    injectDecoder(channel, decode);
+                }
+            }
+        });
+    }
+
+    private void injectDecoder(final Channel channel, final BungeeDecodeHandler handler) {
+        if (channel.pipeline().get(VIA_DECODER) != null) {
+            channel.pipeline().remove(VIA_DECODER);
+        }
+        channel.pipeline().addBefore(PACKET_DECODER, VIA_DECODER, handler);
     }
 
     @Override
