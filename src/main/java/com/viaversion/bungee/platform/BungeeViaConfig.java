@@ -28,8 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class BungeeViaConfig extends AbstractViaConfig {
-    protected final List<String> UNSUPPORTED = new ArrayList<>();
+public final class BungeeViaConfig extends AbstractViaConfig {
+
+    private final List<String> UNSUPPORTED = new ArrayList<>();
 
     public BungeeViaConfig(File folder, Logger logger) {
         super(new File(folder, "viaversion.yml"), logger);

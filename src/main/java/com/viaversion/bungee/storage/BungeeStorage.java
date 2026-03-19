@@ -26,7 +26,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class BungeeStorage implements StorableObject {
+public final class BungeeStorage implements StorableObject {
+
     private static Field bossField;
 
     static {

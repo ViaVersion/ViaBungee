@@ -23,16 +23,17 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
+import io.netty.channel.Channel;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import io.netty.channel.Channel;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
-public class BungeeVersionProvider extends BaseVersionProvider {
+public final class BungeeVersionProvider extends BaseVersionProvider {
+
     private static final MethodHandle GET_SERVER_CONNECTOR;
     private static final MethodHandle GET_BUNGEE_SERVER_INFO;
     private static final MethodHandle GET_SERVER_NAME;

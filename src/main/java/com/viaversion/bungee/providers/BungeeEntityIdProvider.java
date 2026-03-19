@@ -23,7 +23,8 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import java.lang.reflect.Method;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class BungeeEntityIdProvider extends EntityIdProvider {
+public final class BungeeEntityIdProvider extends EntityIdProvider {
+
     private static final Method GET_CLIENT_ENTITY_ID;
 
     static {

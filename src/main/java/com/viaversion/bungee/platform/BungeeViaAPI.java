@@ -17,15 +17,12 @@
  */
 package com.viaversion.bungee.platform;
 
-import com.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.ViaAPIBase;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
+public final class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
 
     @Override
     public ProtocolVersion getPlayerProtocolVersion(ProxiedPlayer player) {
@@ -35,14 +32,5 @@ public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
     @Override
     public void sendRawPacket(ProxiedPlayer player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    /**
-     * Forces ViaVersion to probe a server
-     *
-     * @param serverInfo The serverinfo to probe
-     */
-    public void probeServer(ServerInfo serverInfo) {
-        ((ProtocolDetectorService) Via.proxyPlatform().protocolDetectorService()).probeServer(serverInfo);
     }
 }

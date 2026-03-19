@@ -17,35 +17,19 @@
  */
 package com.viaversion.bungee;
 
+import com.viaversion.viaaprilfools.ViaAprilFoolsPlatformImpl;
 import com.viaversion.viaaprilfools.api.VAFServerVersionProvider;
-import com.viaversion.viaaprilfools.platform.ViaAprilFoolsPlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import java.io.File;
-import java.util.logging.Logger;
 
-public record ViaAprilFoolsLoader(Logger logger, File dataFolder) implements ViaAprilFoolsPlatform {
+public final class ViaAprilFoolsLoader extends ViaAprilFoolsPlatformImpl {
 
-    public ViaAprilFoolsLoader(final Logger logger, final File dataFolder) {
-        this.logger = logger;
-        this.dataFolder = dataFolder;
-        this.init(new File(this.dataFolder, "viaaprilfools.yml"));
-
+    public ViaAprilFoolsLoader() {
         final ViaManager manager = Via.getManager();
         manager.addPostEnableListener(() -> {
             final VersionProvider delegate = manager.getProviders().get(VersionProvider.class);
             manager.getProviders().use(VersionProvider.class, new VAFServerVersionProvider(delegate));
         });
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public File getDataFolder() {
-        return dataFolder;
     }
 }

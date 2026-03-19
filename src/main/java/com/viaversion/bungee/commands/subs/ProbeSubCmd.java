@@ -22,7 +22,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 
-public class ProbeSubCmd implements ViaSubCommand {
+public final class ProbeSubCmd implements ViaSubCommand {
+
     @Override
     public String name() {
         return "probe";

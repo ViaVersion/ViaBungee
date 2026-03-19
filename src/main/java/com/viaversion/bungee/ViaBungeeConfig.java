@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class ViaBungeeConfig extends Config {
+public final class ViaBungeeConfig extends Config {
 
     private int bungeePingInterval;
     private boolean bungeePingSave;
     private Map<String, Integer> bungeeServerProtocols;
 
-    protected ViaBungeeConfig(final File configFile, final Logger logger) {
+    ViaBungeeConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
     }
 

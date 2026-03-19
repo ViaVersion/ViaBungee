@@ -27,10 +27,8 @@ import java.util.logging.Level;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-/*
-    This solves the wrong main hand issue when you join with BungeeCord on a 1.8 server, and switch to a 1.9 or higher.
- */
-public class BungeeMainHandProvider extends MainHandProvider {
+// This solves the wrong main hand issue when you join with BungeeCord on a 1.8 server, and switch to a 1.9 or higher.
+public final class BungeeMainHandProvider extends MainHandProvider {
     private static Method getSettings;
     private static Method setMainHand;
 
@@ -45,9 +43,15 @@ public class BungeeMainHandProvider extends MainHandProvider {
     @Override
     public void setMainHand(UserConnection user, int hand) {
         ProtocolInfo info = user.getProtocolInfo();
-        if (info == null || info.getUuid() == null) return;
+        if (info == null || info.getUuid() == null) {
+            return;
+        }
+
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(info.getUuid());
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
+
         try {
             Object settings = getSettings.invoke(player);
             if (settings != null) {

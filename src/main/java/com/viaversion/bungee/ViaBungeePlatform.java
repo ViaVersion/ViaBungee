@@ -26,6 +26,8 @@ import com.viaversion.bungee.platform.BungeeViaInjector;
 import com.viaversion.bungee.platform.BungeeViaLoader;
 import com.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viabackwards.ViaBackwardsPlatformImpl;
+import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
@@ -49,6 +51,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPlayer> {
+
     private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
     private final ViaBungeePlugin plugin;
     private final BungeeViaAPI api;
@@ -88,15 +91,15 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
 
         if (hasClass("com.viaversion.viabackwards.api.ViaBackwardsPlatform")) {
             getLogger().info("Found ViaBackwards, loading it");
-            Via.getManager().addEnableListener(() -> new ViaBackwardsLoader(getLogger(), getDataFolder()));
+            Via.getManager().addEnableListener(ViaBackwardsPlatformImpl::new);
         }
         if (hasClass("com.viaversion.viarewind.api.ViaRewindPlatform")) {
             getLogger().info("Found ViaRewind, loading it");
-            Via.getManager().addEnableListener(() -> new ViaRewindLoader(getLogger(), getDataFolder()));
+            Via.getManager().addEnableListener(ViaRewindPlatformImpl::new);
         }
-        if (hasClass("net.raphimc.viaaprilfools.platform.ViaAprilFoolsPlatform")) {
+        if (hasClass("com.viaversion.viaaprilfools.platform.ViaAprilFoolsPlatform")) {
             getLogger().info("Found ViaAprilFools, loading it");
-            Via.getManager().addEnableListener(() -> new ViaAprilFoolsLoader(getLogger(), getDataFolder()));
+            Via.getManager().addEnableListener(ViaAprilFoolsLoader::new);
         }
     }
 
@@ -187,11 +190,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     @Override
     public File getDataFolder() {
         return plugin.getDataFolder();
-    }
-
-    @Override
-    public void onReload() {
-        // Injector prints a message <3
     }
 
     @Override

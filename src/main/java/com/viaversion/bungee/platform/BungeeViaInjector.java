@@ -17,8 +17,6 @@
  */
 package com.viaversion.bungee.platform;
 
-import com.viaversion.bungee.handlers.BungeeDecodeHandler;
-import com.viaversion.bungee.handlers.BungeeEncodeHandler;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaInjector;
@@ -27,6 +25,8 @@ import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectLinkedOpenHashSet;
 import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonObject;
+import com.viaversion.viaversion.platform.ViaDecodeHandler;
+import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import io.netty.channel.Channel;
@@ -45,14 +45,13 @@ import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.channel.BungeeChannelInitializer;
 import net.md_5.bungee.protocol.packet.SetCompression;
 
-import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_DECODER;
-import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_ENCODER;
-import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODER;
-import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODE_REORDER;
-import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODER;
-import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODE_REORDER;
+public final class BungeeViaInjector implements ViaInjector {
 
-public class BungeeViaInjector implements ViaInjector {
+    public static final String PACKET_DECODER = "packet-decoder";
+    public static final String PACKET_ENCODER = "packet-encoder";
+
+    public static final String VIA_DECODE_REORDER = "via-decode-reorder";
+    public static final String VIA_ENCODE_REORDER = "via-encode-reorder";
 
     private final List<Channel> injectedChannels = new ArrayList<>();
 
@@ -85,11 +84,11 @@ public class BungeeViaInjector implements ViaInjector {
         final UserConnection connection = new UserConnectionImpl(channel, clientside);
         new ProtocolPipelineImpl(connection);
 
-        final BungeeDecodeHandler decode = new BungeeDecodeHandler(connection);
-        final BungeeEncodeHandler encode = new BungeeEncodeHandler(connection);
+        final ViaDecodeHandler decode = new ViaDecodeHandler(connection);
+        final ViaEncodeHandler encode = new ViaEncodeHandler(connection);
 
         injectDecoder(channel, decode);
-        channel.pipeline().addBefore(PACKET_ENCODER, VIA_ENCODER, encode);
+        channel.pipeline().addBefore(PACKET_ENCODER, Via.getManager().getInjector().getEncoderName(), encode);
 
         channel.pipeline().addAfter(PACKET_ENCODER, VIA_ENCODE_REORDER, new ChannelOutboundHandlerAdapter() {
 
@@ -114,11 +113,12 @@ public class BungeeViaInjector implements ViaInjector {
         });
     }
 
-    private void injectDecoder(final Channel channel, final BungeeDecodeHandler handler) {
-        if (channel.pipeline().get(VIA_DECODER) != null) {
-            channel.pipeline().remove(VIA_DECODER);
+    private void injectDecoder(final Channel channel, final ViaDecodeHandler handler) {
+        final String decoder = Via.getManager().getInjector().getEncoderName();
+        if (channel.pipeline().get(decoder) != null) {
+            channel.pipeline().remove(decoder);
         }
-        channel.pipeline().addBefore(PACKET_DECODER, VIA_DECODER, handler);
+        channel.pipeline().addBefore(PACKET_DECODER, decoder, handler);
     }
 
     @Override

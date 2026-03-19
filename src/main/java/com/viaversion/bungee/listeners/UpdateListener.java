@@ -24,12 +24,11 @@ import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-public class UpdateListener implements Listener {
+public final class UpdateListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
-        if (e.getPlayer().hasPermission("viaversion.update")
-            && Via.getConfig().isCheckForUpdates()) {
+        if (e.getPlayer().hasPermission("viaversion.update") && Via.getConfig().isCheckForUpdates()) {
             final UserConnection connection = Via.getManager().getConnectionManager().getServerConnection(e.getPlayer().getUniqueId());
             if (connection != null) {
                 UpdateUtil.sendUpdateMessage(connection);

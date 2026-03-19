@@ -21,7 +21,8 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class BungeeCommand extends Command implements TabExecutor {
+public final class BungeeCommand extends Command implements TabExecutor {
+
     private final BungeeCommandHandler handler;
 
     public BungeeCommand(BungeeCommandHandler handler) {

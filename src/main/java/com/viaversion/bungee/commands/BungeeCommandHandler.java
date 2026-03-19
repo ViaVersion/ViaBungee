@@ -23,6 +23,7 @@ import com.viaversion.viaversion.commands.ViaCommandHandler;
 public class BungeeCommandHandler extends ViaCommandHandler {
 
     public BungeeCommandHandler() {
+        super(true);
         registerSubCommand(new ProbeSubCmd());
     }
 }

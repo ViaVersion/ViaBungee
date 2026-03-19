@@ -22,7 +22,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import java.util.UUID;
 
-public class BungeeBossBarProvider extends BossBarProvider {
+public final class BungeeBossBarProvider extends BossBarProvider {
+
     @Override
     public void handleAdd(UserConnection user, UUID barUUID) {
         if (user.has(BungeeStorage.class)) {

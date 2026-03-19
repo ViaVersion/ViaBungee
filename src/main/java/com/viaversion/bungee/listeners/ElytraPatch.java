@@ -36,12 +36,14 @@ import net.md_5.bungee.event.EventPriority;
 /*
  * This patches https://github.com/ViaVersion/ViaVersion/issues/555
  */
-public class ElytraPatch implements Listener {
+public final class ElytraPatch implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerConnected(ServerConnectedEvent event) {
         UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
-        if (user == null) return;
+        if (user == null) {
+            return;
+        }
 
         if (user.getProtocolInfo().getPipeline().contains(Protocol1_8To1_9.class)) {
             EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
