@@ -18,6 +18,7 @@
 package com.viaversion.bungee.listeners;
 
 import com.viaversion.bungee.ViaBungeePlatform;
+import com.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.ConnectionDetails;
@@ -53,6 +54,9 @@ public final class ConnectionDetailsListener implements Listener {
         if (connection != null) {
             // Update tracked UUID to the actual one set on the server
             connection.getProtocolInfo().setUuid(e.getPlayer().getUniqueId());
+            if (!connection.has(BungeeStorage.class)) {
+                connection.put(new BungeeStorage(e.getServer()));
+            }
 
             ConnectionDetails.sendConnectionDetails(connection, ConnectionDetails.PROXY_CHANNEL);
         }

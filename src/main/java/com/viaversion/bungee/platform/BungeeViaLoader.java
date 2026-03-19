@@ -21,7 +21,6 @@ import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.bungee.listeners.ConnectionDetailsListener;
 import com.viaversion.bungee.listeners.ElytraPatch;
 import com.viaversion.bungee.listeners.UpdateListener;
-import com.viaversion.bungee.providers.BungeeBossBarProvider;
 import com.viaversion.bungee.providers.BungeeEntityIdProvider;
 import com.viaversion.bungee.providers.BungeeMainHandProvider;
 import com.viaversion.bungee.providers.BungeeVersionProvider;
@@ -29,7 +28,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
 import java.util.HashSet;
@@ -67,10 +65,9 @@ public final class BungeeViaLoader implements ViaPlatformLoader {
 
         // Providers
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
-        Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
+        Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider(plugin));
 
         if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {
-            Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
             Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
         }
 

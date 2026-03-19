@@ -26,6 +26,7 @@ import com.viaversion.bungee.platform.BungeeViaInjector;
 import com.viaversion.bungee.platform.BungeeViaLoader;
 import com.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viabackwards.ViaBackwardsPlatformImpl;
 import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
@@ -50,6 +51,7 @@ import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPlayer> {
@@ -181,7 +183,8 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     public void sendCustomPayload(final UserConnection connection, final String channel, final byte[] message) {
         final ProxiedPlayer player = getProxy().getPlayer(connection.getProtocolInfo().getUuid());
         if (player != null) {
-            player.getServer().sendData(channel, message);
+            final Server server = connection.get(BungeeStorage.class).server();
+            server.sendData(channel, message);
         }
     }
 

@@ -17,7 +17,7 @@
  */
 package com.viaversion.bungee.providers;
 
-import com.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.bungee.ViaBungeePlatform;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import java.lang.reflect.Method;
@@ -35,11 +35,15 @@ public final class BungeeEntityIdProvider extends EntityIdProvider {
         }
     }
 
+    private final ViaBungeePlatform plugin;
+
+    public BungeeEntityIdProvider(ViaBungeePlatform plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public int getEntityId(UserConnection user) throws Exception {
-        BungeeStorage storage = user.get(BungeeStorage.class);
-        ProxiedPlayer player = storage.getPlayer();
-
+        ProxiedPlayer player = this.plugin.getProxy().getPlayer(user.getProtocolInfo().getUuid());
         return (int) GET_CLIENT_ENTITY_ID.invoke(player);
     }
 }
