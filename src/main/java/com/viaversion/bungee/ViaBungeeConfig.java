@@ -46,10 +46,6 @@ public final class ViaBungeeConfig extends Config {
     }
 
     @Override
-    protected void handleConfig(final Map<String, Object> config) {
-    }
-
-    @Override
     public URL getDefaultConfigURL() {
         return getClass().getClassLoader().getResource("assets/viabungee/config.yml");
     }
@@ -57,11 +53,6 @@ public final class ViaBungeeConfig extends Config {
     @Override
     public InputStream getDefaultConfigInputStream() {
         return getClass().getClassLoader().getResourceAsStream("assets/viabungee/config.yml");
-    }
-
-    @Override
-    public List<String> getUnsupportedOptions() {
-        return List.of();
     }
 
     /**

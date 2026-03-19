@@ -38,7 +38,6 @@ import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
-import com.viaversion.viaversion.util.VersionInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -140,12 +139,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     @Override
     public boolean isProxy() {
         return true;
-    }
-
-    @Override
-    public String getPluginVersion() {
-        // Return the implementation version for dumps and logs
-        return VersionInfo.getVersion();
     }
 
     @Override
