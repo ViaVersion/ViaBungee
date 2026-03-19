@@ -25,4 +25,7 @@ public class PipelineConstants {
     public static final String VIA_DECODER = "via-decoder";
     public static final String VIA_ENCODER = "via-encoder";
 
+    public static final String VIA_DECODE_REORDER =  "via-decode-reorder";
+    public static final String VIA_ENCODE_REORDER = "via-encode-reorder";
+
 }

@@ -48,7 +48,9 @@ import net.md_5.bungee.protocol.packet.SetCompression;
 import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_DECODER;
 import static com.viaversion.bungee.handlers.PipelineConstants.PACKET_ENCODER;
 import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_DECODE_REORDER;
 import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODER;
+import static com.viaversion.bungee.handlers.PipelineConstants.VIA_ENCODE_REORDER;
 
 public class BungeeViaInjector implements ViaInjector {
 
@@ -89,7 +91,7 @@ public class BungeeViaInjector implements ViaInjector {
         injectDecoder(channel, decode);
         channel.pipeline().addBefore(PACKET_ENCODER, VIA_ENCODER, encode);
 
-        channel.pipeline().addAfter(PACKET_ENCODER, "via-encode-reorder", new ChannelOutboundHandlerAdapter() {
+        channel.pipeline().addAfter(PACKET_ENCODER, VIA_ENCODE_REORDER, new ChannelOutboundHandlerAdapter() {
 
             @Override
             public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
@@ -100,7 +102,7 @@ public class BungeeViaInjector implements ViaInjector {
             }
         });
 
-        channel.pipeline().addAfter(PACKET_DECODER, "via-decode-reorder", new ChannelInboundHandlerAdapter() {
+        channel.pipeline().addAfter(PACKET_DECODER, VIA_DECODE_REORDER, new ChannelInboundHandlerAdapter() {
 
             @Override
             public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
