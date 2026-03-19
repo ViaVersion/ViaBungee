@@ -22,6 +22,12 @@ tasks {
     shadowJar {
         archiveFileName.set("ViaBungee-${project.version}.jar")
     }
+    processResources {
+        val projectVersion = project.version
+        filesMatching("bungee.yml") {
+            expand(mapOf("version" to projectVersion))
+        }
+    }
 }
 
 java {
