@@ -18,6 +18,7 @@
 package com.viaversion.bungee.platform;
 
 import com.viaversion.bungee.ViaBungeePlatform;
+import com.viaversion.bungee.listeners.ConnectionDetailsListener;
 import com.viaversion.bungee.listeners.ElytraPatch;
 import com.viaversion.bungee.listeners.UpdateListener;
 import com.viaversion.bungee.providers.BungeeBossBarProvider;
@@ -57,6 +58,7 @@ public final class BungeeViaLoader implements ViaPlatformLoader {
     public void load() {
         // Listeners
         registerListener(new UpdateListener());
+        registerListener(new ConnectionDetailsListener(plugin));
 
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {

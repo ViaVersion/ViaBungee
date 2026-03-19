@@ -31,6 +31,7 @@ import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
@@ -43,9 +44,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -167,6 +170,49 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
     }
 
     @Override
+    public void sendMessage(UserConnection connection, String message) {
+        final ProxiedPlayer player = getProxy().getPlayer(connection.getProtocolInfo().getUuid());
+        if (player != null) {
+            player.sendMessage(TextComponent.fromLegacy(message));
+        }
+    }
+
+    @Override
+    public void sendCustomPayload(final UserConnection connection, final String channel, final byte[] message) {
+        final ProxiedPlayer player = getProxy().getPlayer(connection.getProtocolInfo().getUuid());
+        if (player != null) {
+            player.getServer().sendData(channel, message);
+        }
+    }
+
+    @Override
+    public void sendCustomPayloadToClient(final UserConnection connection, final String channel, final byte[] message) {
+        final ProxiedPlayer player = getProxy().getPlayer(connection.getProtocolInfo().getUuid());
+        if (player != null) {
+            player.sendData(channel, message);
+        }
+    }
+
+    @Override
+    public boolean kickPlayer(UserConnection connection, String message) {
+        final UUID uuid = connection.getProtocolInfo().getUuid();
+        if (uuid == null) {
+            return false;
+        }
+
+        final ProxiedPlayer player = getProxy().getPlayer(uuid);
+        if (player != null) {
+            player.disconnect(TextComponent.fromLegacy(message));
+        }
+        return true;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return plugin.getDataFolder();
+    }
+
+    @Override
     public ViaAPI<ProxiedPlayer> getApi() {
         return api;
     }
@@ -178,11 +224,6 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
 
     public ViaBungeeConfig getBungeeConfig() {
         return bungeeConfig;
-    }
-
-    @Override
-    public File getDataFolder() {
-        return plugin.getDataFolder();
     }
 
     @Override

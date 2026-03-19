@@ -114,7 +114,7 @@ public final class BungeeViaInjector implements ViaInjector {
     }
 
     private void injectDecoder(final Channel channel, final ViaDecodeHandler handler) {
-        final String decoder = Via.getManager().getInjector().getEncoderName();
+        final String decoder = Via.getManager().getInjector().getDecoderName();
         if (channel.pipeline().get(decoder) != null) {
             channel.pipeline().remove(decoder);
         }
