@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaBungee - https://github.com/ViaVersion/ViaBungee
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.bungee;
 
 import com.viaversion.viabackwards.api.ViaBackwardsPlatform;
