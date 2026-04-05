@@ -17,14 +17,17 @@
  */
 package com.viaversion.bungee;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.Config;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 public final class ViaBungeeConfig extends Config {
 
@@ -43,6 +46,43 @@ public final class ViaBungeeConfig extends Config {
         bungeePingInterval = getInt("bungee-ping-interval", 60);
         bungeePingSave = getBoolean("bungee-ping-save", true);
         bungeeServerProtocols = get("bungee-servers", new HashMap<>());
+    }
+
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Parse servers
+        Map<String, Object> servers;
+        if (!(config.get("bungee-servers") instanceof Map)) {
+            servers = new HashMap<>();
+        } else {
+            servers = (Map) config.get("bungee-servers");
+        }
+        // Convert any bad Protocol Ids
+        for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
+            if (!(entry.getValue() instanceof Integer)) {
+                if (entry.getValue() instanceof String stringValue) {
+                    ProtocolVersion found = ProtocolVersion.getClosest(stringValue);
+                    if (found != null) {
+                        servers.put(entry.getKey(), found.getVersion());
+                    } else {
+                        servers.remove(entry.getKey()); // Remove!
+                    }
+                } else {
+                    servers.remove(entry.getKey()); // Remove!
+                }
+            }
+        }
+        // Ensure default exists
+        if (!servers.containsKey("default")) {
+            servers.put("default", ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
+        }
+        // Put back
+        config.put("bungee-servers", servers);
+    }
+
+    @Override
+    public Set<String> getSectionsWithModifiableKeys() {
+        return Set.of("bungee-servers");
     }
 
     @Override

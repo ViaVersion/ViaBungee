@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.viaversion.viabungee"
-version = "0.3.1-SNAPSHOT"
+version = "0.3.1"
 
 dependencies {
     compileOnly("com.viaversion:viaversion-common:5.7.2")

@@ -17,15 +17,10 @@
  */
 package com.viaversion.bungee.platform;
 
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-import net.md_5.bungee.protocol.ProtocolConstants;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public final class BungeeViaConfig extends AbstractViaConfig {
@@ -37,38 +32,6 @@ public final class BungeeViaConfig extends AbstractViaConfig {
 
         UNSUPPORTED.addAll(AbstractViaConfig.BUKKIT_ONLY_OPTIONS);
         UNSUPPORTED.addAll(AbstractViaConfig.VELOCITY_ONLY_OPTIONS);
-    }
-
-    @Override
-    protected void handleConfig(Map<String, Object> config) {
-        // Parse servers
-        Map<String, Object> servers;
-        if (!(config.get("bungee-servers") instanceof Map)) {
-            servers = new HashMap<>();
-        } else {
-            servers = (Map) config.get("bungee-servers");
-        }
-        // Convert any bad Protocol Ids
-        for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
-            if (!(entry.getValue() instanceof Integer)) {
-                if (entry.getValue() instanceof String stringValue) {
-                    ProtocolVersion found = ProtocolVersion.getClosest(stringValue);
-                    if (found != null) {
-                        servers.put(entry.getKey(), found.getVersion());
-                    } else {
-                        servers.remove(entry.getKey()); // Remove!
-                    }
-                } else {
-                    servers.remove(entry.getKey()); // Remove!
-                }
-            }
-        }
-        // Ensure default exists
-        if (!servers.containsKey("default")) {
-            servers.put("default", ProtocolConstants.SUPPORTED_VERSION_IDS.get(0));
-        }
-        // Put back
-        config.put("bungee-servers", servers);
     }
 
     @Override
