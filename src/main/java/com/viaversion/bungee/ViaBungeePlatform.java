@@ -27,6 +27,7 @@ import com.viaversion.bungee.platform.BungeeViaLoader;
 import com.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.viaaprilfools.ViaAprilFoolsPlatformImpl;
 import com.viaversion.viabackwards.ViaBackwardsPlatformImpl;
 import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
@@ -103,7 +104,7 @@ public final class ViaBungeePlatform implements ViaServerProxyPlatform<ProxiedPl
         }
         if (hasClass("com.viaversion.viaaprilfools.platform.ViaAprilFoolsPlatform")) {
             getLogger().info("Found ViaAprilFools, loading it");
-            Via.getManager().addEnableListener(ViaAprilFoolsLoader::new);
+            Via.getManager().addEnableListener(() -> new ViaAprilFoolsPlatformImpl(false));
         }
     }
 
